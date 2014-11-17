@@ -41,7 +41,7 @@ Notice that this configuration is optional, AXTProgressiveMigrationManager has a
 ##Acknowledgements
 AXTProgressiveMigrationManager learned a lot from [Marcus S. Zarra][core data book author twitter] - [Core Data Book][core data book]. Thanks for his great work.
 ##License
-AXTProgressiveMigrationManager is available under the MIT license. See the LICENSE file for more info.
+AXTProgressiveMigrationManager is available under the BSD license. See the LICENSE file for more info.
 
 #帮助
 ##AXTProgressiveMigrationManager
@@ -83,7 +83,7 @@ AXTProgressiveMigrationManager 需要一个 managedObjectModel 的搜索规则�
 ##感谢
 AXTProgressiveMigrationManager基于 [Marcus S. Zarra][core data book author twitter]的 [Core Data 教程][core data book]内的思路进行开发，感谢他所撰写的这本教程。 
 ##协议
-AXTProgressiveMigrationManager 被许可在 MIT 协议下使用, 查阅 LICENSE 文件来获得更多信息。
+AXTProgressiveMigrationManager 被许可在 BSD 协议下使用, 查阅 LICENSE 文件来获得更多信息。
 
 <!-- external links -->
 [apple document lightweight]:https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/CoreDataVersioning/Articles/vmLightweightMigration.html
