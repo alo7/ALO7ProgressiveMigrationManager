@@ -1,6 +1,6 @@
 AXTProgressiveMigrationManager
 ==============================
-![License MIT](https://go-shields.herokuapp.com/license-MIT-blue.png)
+![License BSD](https://go-shields.herokuapp.com/license-BSD-blue.png)
 #README
 ##AXTProgressiveMigrationManager
 AXTProgressiveMigrationManager optimises the procedure of migrating the Core Data store on iOS platform.
