@@ -1,6 +1,7 @@
 AXTProgressiveMigrationManager
 ==============================
 ![License BSD](https://go-shields.herokuapp.com/license-BSD-blue.png)
+![Pod version](http://img.shields.io/cocoapods/v/AXTProgressiveMigrationManager.svg?style=flat)
 #README
 ##AXTProgressiveMigrationManager
 AXTProgressiveMigrationManager optimises the procedure of migrating the Core Data store on iOS platform.
@@ -13,6 +14,10 @@ AXTProgressiveMigrationManager offers support for migrating the Core Data databa
 
 AXTProgressiveMigrationManager starts with finding the corresponding ManagedObjdectModel of the source database file, and searches for consecutive ManagedObjdectModels until the target ManagedObjdectModel is reached. For every two consecutive ManagedObjdectModel, AXTProgressiveMigrationManager checks if a corresponding Mapping Model exists. If exists, a step of heavyweight migration is performed; otherwise a step of lightweight migration is performed. The procedure reaches to an end when the database file is compatible with the target ManagedObjdectModel.
 ##How To Use
+###Installation
+Just drag-and-drop into your project. Or if you prefer to using Cocopods:
+
+    pod 'AXTProgressiveMigrationManager', '~> 1.0.0'
 ###API
 ```
 NSError *error;
@@ -56,6 +61,10 @@ AXTProgressiveMigrationManager 提供了对于渐进式数据库升级的支持�
 AXTProgressiveMigrationManager 从源数据库文件对应的 managedObjectModel 开始，在 bundle 内一路搜索到升级的目标 managedObjectModel；并对每两个连续的 managedObjectModel，在 bundle 内搜索对应的 mapping model 是否存在，如果存在则进行一次重量级升级，否则进行一次轻量级升级；直到最后数据库文件和目标 managedObjectModel 相兼容。
 
 ##如何使用
+###安装
+把源文件拖入工程即可. 如果你喜欢用 CocoaPods 也可以:
+
+    pod 'AXTProgressiveMigrationManager', '~> 1.0.0'
 ###API 调用
 ```
 NSError *error;
