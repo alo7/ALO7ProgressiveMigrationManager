@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.summary          = "Supports progressive migration for iOS Core Data with lightweight and heavyweight migration step mixed."  
   s.homepage         = "https://github.com/alo7/AXTProgressiveMigrationManager"  
   s.license          = 'BSD'  
-  s.author           = { "fogisland" => "zhukaihua1225@126.com" }  
+  s.author           = { "fogisland" => "zhukaihua1225@gmail.com" }  
   s.source           = { :git => "https://github.com/alo7/AXTProgressiveMigrationManager.git", :tag => s.version.to_s }   
   s.platform     = :ios, '7.0'    
   s.requires_arc = true  
