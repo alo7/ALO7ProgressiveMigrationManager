@@ -68,7 +68,7 @@
             [self.allSteps addObject:step];
         }
     } else {
-        DDLogError(@"%@ %@ wrong type of migration step %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), step);
+        NSLog(@"%@ %@ wrong type of migration step %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), step);
     }
 }
 

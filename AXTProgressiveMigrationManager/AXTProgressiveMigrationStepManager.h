@@ -23,6 +23,7 @@
 //    SOFTWARE.
 
 #import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
 
 typedef NS_ENUM(NSUInteger, AXTProgressiveMigrationStepType_E) {
     kAXTProgressiveMigrationStepLightWeight = 1,

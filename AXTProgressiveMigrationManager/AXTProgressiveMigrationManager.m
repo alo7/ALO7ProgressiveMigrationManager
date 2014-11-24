@@ -47,7 +47,7 @@
 - (BOOL)migrateStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType targetModel:(NSManagedObjectModel *)targetModel error:(NSError **)error
 {
     if (!self.delegate) {
-        DDLogError(@"%@ need a delegate to perform progressive migration!", NSStringFromClass([self class]));
+        NSLog(@"%@ need a delegate to perform progressive migration!", NSStringFromClass([self class]));
         return NO;
     }
     
@@ -55,12 +55,12 @@
     AXTProgressiveMigrationStepManager *stepManager = [[AXTProgressiveMigrationStepManager alloc] init];
     BOOL isMigrateStepsGenerated = [self generateMigrateStepsWithManager:stepManager forStoreAtUrl:srcStoreUrl storeType:storeType targetMode:targetModel error:error];
     if (!isMigrateStepsGenerated) {
-        DDLogError(@"%@ generate migrate steps failed!", NSStringFromClass([self class]));
+        NSLog(@"%@ generate migrate steps failed!", NSStringFromClass([self class]));
         return NO;
     }
     
     // 打印steps信息
-    DDLogInfo(@"%@", stepManager);
+    NSLog(@"%@", stepManager);
     
     __block BOOL isMigrateOk = YES;
     // 根据整理出的migration步骤，逐步进行migration
@@ -136,7 +136,7 @@
     } else if (oneStep.migrationType == kAXTProgressiveMigrationStepHeavyWeight) {
         return [self heavyweightMigrationURL:srcStoreUrl srcModel:oneStep.srcModel desModel:oneStep.desModel mappingModel:oneStep.mappingModel storeType:storeType error:error];
     } else {
-        DDLogError(@"migrate one step, type error %@", oneStep);
+        NSLog(@"migrate one step, type error %@", oneStep);
         return NO;
     }
     
