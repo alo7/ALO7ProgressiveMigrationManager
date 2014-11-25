@@ -1,8 +1,8 @@
-//    AXTProgressiveMigrationError.h
+//    ALO7ProgressiveMigrationError.h
 //
 //    The MIT License (MIT)
 //
-//    Copyright (c) 2014 AXTProgressiveMigrationManager https://github.com/Alo7TechTeam
+//    Copyright (c) 2014 ALO7ProgressiveMigrationManager https://github.com/Alo7TechTeam
 //
 //    Permission is hereby granted, free of charge, to any person obtaining a copy
 //    of this software and associated documentation files (the "Software"), to deal
@@ -24,20 +24,20 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString *const kAXTProgressiveMigrateErrorDomain;
+extern NSString *const kALO7ProgressiveMigrateErrorDomain;
 
-typedef NS_ENUM(NSInteger, AXTProgressiveMigrationError_e) {
-    kAXTProgressiveMigrateErrorUnknown = 1,
-    kAXTProgressiveMigrateErrorSrcStoreMetaDataNotFound,
-    kAXTProgressiveMigrateErrorSrcStoreDataModelNotFound,
-    kAXTProgressiveMigrateErrorNextDataModelNotFound,
-    kAXTProgressiveMigrateErrorLigthWeightMigrationFail,
-    kAXTProgressiveMigrateErrorHeavyWeightMigrationBackupOriginStoreFail,
-    kAXTProgressiveMigrateErrorHeavyWeightMigrationCopyNewStoreFail,
-    kAXTProgressiveMigrateErrorMax
+typedef NS_ENUM(NSInteger, ALO7ProgressiveMigrationError_e) {
+    kALO7ProgressiveMigrateErrorUnknown = 1,
+    kALO7ProgressiveMigrateErrorSrcStoreMetaDataNotFound,
+    kALO7ProgressiveMigrateErrorSrcStoreDataModelNotFound,
+    kALO7ProgressiveMigrateErrorNextDataModelNotFound,
+    kALO7ProgressiveMigrateErrorLigthWeightMigrationFail,
+    kALO7ProgressiveMigrateErrorHeavyWeightMigrationBackupOriginStoreFail,
+    kALO7ProgressiveMigrateErrorHeavyWeightMigrationCopyNewStoreFail,
+    kALO7ProgressiveMigrateErrorMax
 };
 
 
-@interface AXTProgressiveMigrationError : NSError
-+ (AXTProgressiveMigrationError *)errorWithCode:(AXTProgressiveMigrationError_e)code;
+@interface ALO7ProgressiveMigrationError : NSError
++ (ALO7ProgressiveMigrationError *)errorWithCode:(ALO7ProgressiveMigrationError_e)code;
 @end

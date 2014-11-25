@@ -1,8 +1,8 @@
-//    NSManagedObjectModel+AXTUtil.m
+//    NSManagedObjectModel+ALO7Util.m
 //
 //    The MIT License (MIT)
 //
-//    Copyright (c) 2014 AXTProgressiveMigrationManager https://github.com/Alo7TechTeam
+//    Copyright (c) 2014 ALO7ProgressiveMigrationManager https://github.com/Alo7TechTeam
 //
 //    Permission is hereby granted, free of charge, to any person obtaining a copy
 //    of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,19 @@
 //    SOFTWARE
 
 
-#import "NSManagedObjectModel+AXTUtil.h"
+#import "NSManagedObjectModel+ALO7Util.h"
 
-const NSInteger kAXTInvalidModelVersionNumber = -1;
+const NSInteger kALO7InvalidModelVersionNumber = -1;
 
-@implementation NSManagedObjectModel (AXTUtil)
-- (NSInteger)AXT_VersionNumber
+@implementation NSManagedObjectModel (ALO7Util)
+- (NSInteger)ALO7_VersionNumber
 {
     NSString *modelVersionIdentifier = [self.versionIdentifiers anyObject];
     
-    return modelVersionIdentifier?[modelVersionIdentifier integerValue]:kAXTInvalidModelVersionNumber;
+    return modelVersionIdentifier?[modelVersionIdentifier integerValue]:kALO7InvalidModelVersionNumber;
 }
 
-- (BOOL)AXT_isMigrationNeededWithStoreType:(NSString *)storeType atPath:(NSString *)storePath
+- (BOOL)ALO7_isMigrationNeededWithStoreType:(NSString *)storeType atPath:(NSString *)storePath
 {
     NSError *error = nil;
     BOOL pscCompatibile = NO;
