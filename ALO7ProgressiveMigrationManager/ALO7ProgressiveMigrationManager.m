@@ -57,7 +57,7 @@
         return NO;
     }
     
-    // 整理出migration所需的最少步骤：将连续的轻量级migration合并在一步内
+    // preprocess the migration steps to minimum count; consecutive lightweight steps will be merged into one step
     ALO7ProgressiveMigrationStepManager *stepManager = [[ALO7ProgressiveMigrationStepManager alloc] init];
     BOOL isMigrateStepsGenerated = [self generateMigrateStepsWithManager:stepManager forStoreAtUrl:srcStoreUrl storeType:storeType targetMode:targetModel error:error];
     if (!isMigrateStepsGenerated) {
@@ -65,11 +65,10 @@
         return NO;
     }
     
-    // 打印steps信息
     NSLog(@"%@", stepManager);
     
     __block BOOL isMigrateOk = YES;
-    // 根据整理出的migration步骤，逐步进行migration
+    // start to migrate step by step
     [stepManager enumerateStepsUsingBlock:^(ALO7ProgressiveMigrationStep *step, NSUInteger idx, BOOL *stop){
         if(![self migrateOneStep:step forStoreAtUrl:srcStoreUrl storeType:storeType error:error]) {
             isMigrateOk = NO;
@@ -84,7 +83,7 @@
 
 - (BOOL)generateMigrateStepsWithManager:(ALO7ProgressiveMigrationStepManager *)stepManager forStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType targetMode:(NSManagedObjectModel *)targetModel  error:(NSError **)error
 {
-    // 从src store中取出model的meta信息, 再根据meta从bundle中找出对应的data model
+    // find the data model file according to the source store file
     NSDictionary *srcMetaData = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:storeType URL:srcStoreUrl error:error];
     if (!srcMetaData) {
         *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorSrcStoreMetaDataNotFound];
@@ -97,35 +96,35 @@
         return NO;
     }
     
-    // 从src data model开始，循环寻找下一个data model，记录两个model之间的migration步骤；一直到target model为止。
+    // starts from the src data model, found the next data model and record one migration step info repeatly, until the target data model is reached
     NSManagedObjectModel *nextModel;
     while (1) {
-        // 通过delegate判断当前model是否和target model相同
+        // check if current model equals to the targe model by delegate method
         if ([self.delegate respondsToSelector:@selector(modelA:equalsToModelB:)]) {
             if ([self.delegate modelA:srcModel equalsToModelB:targetModel]) {
                 break;
             }
-        } else { // 如果delegate没有实现比较两个model的自定义规则，则采用默认方式，比较model的entityVersionHashesByName属性
+        } else {
             if ([self modelA:srcModel defaultEqualsToModelB:targetModel]) {
                 break;
             }
         }
         
-        // 通过delegate找出当前model的下一个data model,这个delegate方法是必须要实现的。
+        // find the next data model by delegate method
         nextModel = [self.delegate nextModelOfModel:srcModel amongModelPaths:self.allDataModelPaths];
         if (!nextModel) {
             *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorNextDataModelNotFound];
             return NO;
         }
         
-        // 尝试寻找两个相邻的model之间的mapping model
+        // check if one mapping model exists
         NSMappingModel *mappingModel = [NSMappingModel mappingModelFromBundles:nil forSourceModel:srcModel destinationModel:nextModel];
         if (mappingModel) {
-            // mapping model存在, 创建一个heavy migration step
+            // mapping model is found, thus we create one heavy migration step
             [stepManager addOneStep:[ALO7ProgressiveMigrationStep stepOfHeavyWeightWithSrcModel:srcModel desModel:nextModel mappingModel:mappingModel]];
         } else {
-            // mapping model不存在, 创建一个light migration step;
-            // stepManager会自动将相邻的light weight migration合并在一起作为一步
+            // mapping model is not found, thus we create one light migration step
+            // the stepManager will automatically merge consecutive light migration steps
             [stepManager addOneStep:[ALO7ProgressiveMigrationStep stepOfLightWeightWithSrcModel:srcModel desModel:nextModel]];
         }
         
@@ -179,7 +178,7 @@
     NSString *srcStoreExtension = [[sourceStoreURL path] pathExtension];
     NSString *srcStorePath = [[sourceStoreURL path] stringByDeletingPathExtension];
     
-    // 创建两个文件path，用于存放新的db文件和备份老的db文件。创建完path后，检查一下path下是否已经存在文件，如果有，可能是以前不成功的migraion留下的，需要删除掉。
+    // create two file path for storing new db file and backup old db file
     NSString *newStorePath = [NSString stringWithFormat:@"%@.new.%@", srcStorePath, srcStoreExtension];
     NSURL *newStoreURL = [NSURL fileURLWithPath:newStorePath];
     if ([fileManager fileExistsAtPath:newStorePath]) {
@@ -190,25 +189,25 @@
         [fileManager removeItemAtPath:backupStorePath error:nil];
     }
     
-    // heavy migraion
+    // do the heavy migraion
     if (![migrateManager migrateStoreFromURL:sourceStoreURL type:type options:nil withMappingModel:mappingModel toDestinationURL:newStoreURL destinationType:type destinationOptions:nil error:error]) {
         return NO;
     }
 
-    // 备份原始store文件
+    // backup origin db file
     if (![fileManager moveItemAtPath:[sourceStoreURL path] toPath:backupStorePath error:nil]) {
         *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorHeavyWeightMigrationBackupOriginStoreFail];
         return NO;
     }
     
-    // 用新store替换原始store，如果替换失败，尝试将备份的store文件恢复
+    // replace the origin db file with the new db file ,if fail, restore the origin db file from the backup
     if (![fileManager moveItemAtPath:newStorePath toPath:[sourceStoreURL path] error:nil]) {
         [fileManager moveItemAtPath:backupStorePath toPath:[sourceStoreURL path] error:nil];
         *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorHeavyWeightMigrationCopyNewStoreFail];
         return NO;
     }
     
-    // 删除中间文件
+    // delete temp file
     [fileManager removeItemAtPath:newStorePath error:nil];
     [fileManager removeItemAtPath:backupStorePath error:nil];
     
@@ -223,7 +222,7 @@
         return nil;
     }
     
-    // 自定义的next model规则：version number递增
+    // the default rule for find next datamodel: increase the version number by 1
     NSSet *nextVersionIdentifiers = [NSSet setWithObject:[NSString stringWithFormat:@"%ld", (long)sourceVersionNumber + 1]];
     for (NSString * path in allModelPaths) {
         NSManagedObjectModel *oneModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:[NSURL fileURLWithPath:path]];
@@ -254,7 +253,6 @@
     if (!_allDataModelPaths) {
         NSMutableArray *modelPaths = [NSMutableArray array];
         
-        // 从model bundles内收集data model
         NSArray *momdArray = [[NSBundle mainBundle] pathsForResourcesOfType:@"momd" inDirectory:nil];
         for (NSString *momdPath in momdArray) {
             NSString *resourceSubpath = [momdPath lastPathComponent];
@@ -262,7 +260,6 @@
             [modelPaths addObjectsFromArray:array];
         }
         
-        // 直接在main bundle下面收集data model
         NSArray* otherModels = [[NSBundle mainBundle] pathsForResourcesOfType:@"mom" inDirectory:nil];
         [modelPaths addObjectsFromArray:otherModels];
         

@@ -41,9 +41,10 @@
     if (step.migrationType == kALO7ProgressiveMigrationStepHeavyWeight) {
         BOOL isNeedInsertOneLightStep = NO;
         
-        /* Bug: 如果第一步就是 heavy migration 会失败，尚未查出原因，目前采用规避的方式来解决;
-         * 当发现heavy migration前没有其它步骤，或者前一步不是light migration时，插入一步light migration;
-         * 这一步light migration的src和des model均为heavy migration的src model.
+        /* Bug is found here but not directly resolved:
+         * if the first step is heavy migration, it will fail for unknown reason;
+         * but if we insert one light migration before it(just migrate from self to self), everything is normal.
+         * Better solution is appreciated.
          */
         if ([self.allSteps count] == 0) {
             isNeedInsertOneLightStep = YES;
@@ -61,7 +62,6 @@
         
         [self.allSteps addObject:step];
     } else if (step.migrationType == kALO7ProgressiveMigrationStepLightWeight) {
-        // add lightWeigth step: 如果有前一步，并且前一步也是light migration, 则合并为一步；否则，添加为新的一步
         if ([self.allSteps count] > 0) {
             ALO7ProgressiveMigrationStep *lastStep = [self.allSteps lastObject];
             if (lastStep.migrationType == kALO7ProgressiveMigrationStepLightWeight) {
