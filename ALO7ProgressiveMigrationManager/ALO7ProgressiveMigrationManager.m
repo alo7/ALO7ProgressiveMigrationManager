@@ -1,43 +1,49 @@
-//    AXTProgressiveMigrationManager.m
+//    ALO7ProgressiveMigrationManager.m
 //
-//    The MIT License (MIT)
+//    Copyright (c) 2014-present, ALO7, Inc. https://github.com/alo7
+//    All rights reserved.
 //
-//    Copyright (c) 2014 AXTProgressiveMigrationManager https://github.com/Alo7TechTeam
+//    Redistribution and use in source and binary forms, with or without
+//    modification, are permitted provided that the following conditions are met:
 //
-//    Permission is hereby granted, free of charge, to any person obtaining a copy
-//    of this software and associated documentation files (the "Software"), to deal
-//    in the Software without restriction, including without limitation the rights
-//    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//    copies of the Software, and to permit persons to whom the Software is
-//    furnished to do so, subject to the following conditions:
+//    * Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer.
 //
-//    The above copyright notice and this permission notice shall be included in all
-//    copies or substantial portions of the Software.
+//    * Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
 //
-//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//    SOFTWARE.
+//    * Neither the name of test nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+//    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+//    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+//    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+//    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+//    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+//             SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+//    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+//    OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+//    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "AXTProgressiveMigrationManager.h"
-#import "AXTProgressiveMigrationStepManager.h"
+#import "ALO7ProgressiveMigrationManager.h"
+#import "ALO7ProgressiveMigrationStepManager.h"
 
 
-@interface AXTProgressiveMigrationManager() <AXTProgressiveMigrateDelegate>
+@interface ALO7ProgressiveMigrationManager() <ALO7ProgressiveMigrateDelegate>
 @property (nonatomic, strong) NSArray *allDataModelPaths;
 @property (nonatomic, strong, readwrite) NSManagedObjectModel *migrationSrcModel;
 @end
 
-@implementation AXTProgressiveMigrationManager
+@implementation ALO7ProgressiveMigrationManager
 + (instancetype)sharedManager
 {
     static dispatch_once_t onceToken;
-    static AXTProgressiveMigrationManager *manager;
+    static ALO7ProgressiveMigrationManager *manager;
     dispatch_once(&onceToken, ^{
-        manager = [[AXTProgressiveMigrationManager alloc] init];
+        manager = [[ALO7ProgressiveMigrationManager alloc] init];
         manager.delegate = manager;
     });
     
@@ -52,7 +58,7 @@
     }
     
     // 整理出migration所需的最少步骤：将连续的轻量级migration合并在一步内
-    AXTProgressiveMigrationStepManager *stepManager = [[AXTProgressiveMigrationStepManager alloc] init];
+    ALO7ProgressiveMigrationStepManager *stepManager = [[ALO7ProgressiveMigrationStepManager alloc] init];
     BOOL isMigrateStepsGenerated = [self generateMigrateStepsWithManager:stepManager forStoreAtUrl:srcStoreUrl storeType:storeType targetMode:targetModel error:error];
     if (!isMigrateStepsGenerated) {
         NSLog(@"%@ generate migrate steps failed!", NSStringFromClass([self class]));
@@ -64,7 +70,7 @@
     
     __block BOOL isMigrateOk = YES;
     // 根据整理出的migration步骤，逐步进行migration
-    [stepManager enumerateStepsUsingBlock:^(AXTProgressiveMigrationStep *step, NSUInteger idx, BOOL *stop){
+    [stepManager enumerateStepsUsingBlock:^(ALO7ProgressiveMigrationStep *step, NSUInteger idx, BOOL *stop){
         if(![self migrateOneStep:step forStoreAtUrl:srcStoreUrl storeType:storeType error:error]) {
             isMigrateOk = NO;
             *stop = YES;
@@ -76,18 +82,18 @@
 
 #pragma mark - Migrate details(private methods)
 
-- (BOOL)generateMigrateStepsWithManager:(AXTProgressiveMigrationStepManager *)stepManager forStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType targetMode:(NSManagedObjectModel *)targetModel  error:(NSError **)error
+- (BOOL)generateMigrateStepsWithManager:(ALO7ProgressiveMigrationStepManager *)stepManager forStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType targetMode:(NSManagedObjectModel *)targetModel  error:(NSError **)error
 {
     // 从src store中取出model的meta信息, 再根据meta从bundle中找出对应的data model
     NSDictionary *srcMetaData = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:storeType URL:srcStoreUrl error:error];
     if (!srcMetaData) {
-        *error = [AXTProgressiveMigrationError errorWithCode:kAXTProgressiveMigrateErrorSrcStoreMetaDataNotFound];
+        *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorSrcStoreMetaDataNotFound];
         return NO;
     }
     NSManagedObjectModel *srcModel = [NSManagedObjectModel mergedModelFromBundles:nil forStoreMetadata:srcMetaData];
     self.migrationSrcModel = srcModel;
     if (!srcModel) {
-        *error = [AXTProgressiveMigrationError errorWithCode:kAXTProgressiveMigrateErrorSrcStoreDataModelNotFound];
+        *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorSrcStoreDataModelNotFound];
         return NO;
     }
     
@@ -108,7 +114,7 @@
         // 通过delegate找出当前model的下一个data model,这个delegate方法是必须要实现的。
         nextModel = [self.delegate nextModelOfModel:srcModel amongModelPaths:self.allDataModelPaths];
         if (!nextModel) {
-            *error = [AXTProgressiveMigrationError errorWithCode:kAXTProgressiveMigrateErrorNextDataModelNotFound];
+            *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorNextDataModelNotFound];
             return NO;
         }
         
@@ -116,11 +122,11 @@
         NSMappingModel *mappingModel = [NSMappingModel mappingModelFromBundles:nil forSourceModel:srcModel destinationModel:nextModel];
         if (mappingModel) {
             // mapping model存在, 创建一个heavy migration step
-            [stepManager addOneStep:[AXTProgressiveMigrationStep stepOfHeavyWeightWithSrcModel:srcModel desModel:nextModel mappingModel:mappingModel]];
+            [stepManager addOneStep:[ALO7ProgressiveMigrationStep stepOfHeavyWeightWithSrcModel:srcModel desModel:nextModel mappingModel:mappingModel]];
         } else {
             // mapping model不存在, 创建一个light migration step;
             // stepManager会自动将相邻的light weight migration合并在一起作为一步
-            [stepManager addOneStep:[AXTProgressiveMigrationStep stepOfLightWeightWithSrcModel:srcModel desModel:nextModel]];
+            [stepManager addOneStep:[ALO7ProgressiveMigrationStep stepOfLightWeightWithSrcModel:srcModel desModel:nextModel]];
         }
         
         srcModel = nextModel;
@@ -129,11 +135,11 @@
     return YES;
 }
 
-- (BOOL)migrateOneStep:(AXTProgressiveMigrationStep *)oneStep forStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType error:(NSError **)error
+- (BOOL)migrateOneStep:(ALO7ProgressiveMigrationStep *)oneStep forStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType error:(NSError **)error
 {
-    if (oneStep.migrationType == kAXTProgressiveMigrationStepLightWeight) {
+    if (oneStep.migrationType == kALO7ProgressiveMigrationStepLightWeight) {
         return [self lightweightMigrationURL:srcStoreUrl toModel:oneStep.desModel type:storeType error:error];
-    } else if (oneStep.migrationType == kAXTProgressiveMigrationStepHeavyWeight) {
+    } else if (oneStep.migrationType == kALO7ProgressiveMigrationStepHeavyWeight) {
         return [self heavyweightMigrationURL:srcStoreUrl srcModel:oneStep.srcModel desModel:oneStep.desModel mappingModel:oneStep.mappingModel storeType:storeType error:error];
     } else {
         NSLog(@"migrate one step, type error %@", oneStep);
@@ -156,7 +162,7 @@
     [storeCoordinator unlock];
     
     if (persistentStore == nil) {
-        *error = [AXTProgressiveMigrationError errorWithCode:kAXTProgressiveMigrateErrorLigthWeightMigrationFail];
+        *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorLigthWeightMigrationFail];
     }
     
     return (persistentStore != nil);
@@ -191,14 +197,14 @@
 
     // 备份原始store文件
     if (![fileManager moveItemAtPath:[sourceStoreURL path] toPath:backupStorePath error:nil]) {
-        *error = [AXTProgressiveMigrationError errorWithCode:kAXTProgressiveMigrateErrorHeavyWeightMigrationBackupOriginStoreFail];
+        *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorHeavyWeightMigrationBackupOriginStoreFail];
         return NO;
     }
     
     // 用新store替换原始store，如果替换失败，尝试将备份的store文件恢复
     if (![fileManager moveItemAtPath:newStorePath toPath:[sourceStoreURL path] error:nil]) {
         [fileManager moveItemAtPath:backupStorePath toPath:[sourceStoreURL path] error:nil];
-        *error = [AXTProgressiveMigrationError errorWithCode:kAXTProgressiveMigrateErrorHeavyWeightMigrationCopyNewStoreFail];
+        *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorHeavyWeightMigrationCopyNewStoreFail];
         return NO;
     }
     
@@ -209,11 +215,11 @@
     return YES;
 }
 
-#pragma mark - The manager self is the default AXTProgressiveMigrateDelegate
+#pragma mark - The manager self is the default ALO7ProgressiveMigrateDelegate
 - (NSManagedObjectModel *)nextModelOfModel:(NSManagedObjectModel *)model amongModelPaths:(NSArray *)allModelPaths;
 {
-    NSInteger sourceVersionNumber = [model AXT_VersionNumber];
-    if (sourceVersionNumber == kAXTInvalidModelVersionNumber) {
+    NSInteger sourceVersionNumber = [model ALO7_VersionNumber];
+    if (sourceVersionNumber == kALO7InvalidModelVersionNumber) {
         return nil;
     }
     
@@ -231,10 +237,10 @@
 
 - (BOOL)modelA:(NSManagedObjectModel *)modelA equalsToModelB:(NSManagedObjectModel *)modelB
 {
-    NSInteger modelAVersionNumber = [modelA AXT_VersionNumber];
-    NSInteger modelBVersionNumber = [modelB AXT_VersionNumber];
+    NSInteger modelAVersionNumber = [modelA ALO7_VersionNumber];
+    NSInteger modelBVersionNumber = [modelB ALO7_VersionNumber];
     
-    if (modelAVersionNumber == kAXTInvalidModelVersionNumber || modelBVersionNumber == kAXTInvalidModelVersionNumber) {
+    if (modelAVersionNumber == kALO7InvalidModelVersionNumber || modelBVersionNumber == kALO7InvalidModelVersionNumber) {
         return NO;
     } else {
         return (modelAVersionNumber == modelBVersionNumber);
