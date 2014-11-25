@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|  
   s.name             = "ALO7ProgressiveMigrationManager"  
-  s.version          = "1.0.0"  
+  s.version          = "1.0.1"  
   s.summary          = "Supports progressive migration for iOS Core Data with lightweight and heavyweight migration step mixed."  
   s.homepage         = "https://github.com/alo7/ALO7ProgressiveMigrationManager"  
   s.license          = 'BSD'  
