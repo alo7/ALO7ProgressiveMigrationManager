@@ -35,6 +35,7 @@
 @interface ALO7ProgressiveMigrationManager() <ALO7ProgressiveMigrateDelegate>
 @property (nonatomic, strong) NSArray *allDataModelPaths;
 @property (nonatomic, strong, readwrite) NSManagedObjectModel *migrationSrcModel;
+@property (nonatomic, strong) NSBundle *bundle;
 @end
 
 @implementation ALO7ProgressiveMigrationManager
@@ -50,16 +51,18 @@
     return manager;
 }
 
-- (BOOL)migrateStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType targetModel:(NSManagedObjectModel *)targetModel bundles:(NSArray *)bundles error:(NSError **)error
+- (BOOL)migrateStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType targetModel:(NSManagedObjectModel *)targetModel bundle:(NSBundle *)bundle error:(NSError **)error
 {
     if (!self.delegate) {
         NSLog(@"%@ need a delegate to perform progressive migration!", NSStringFromClass([self class]));
         return NO;
     }
     
+    self.bundle = bundle;
+    
     // preprocess the migration steps to minimum count; consecutive lightweight steps will be merged into one step
     ALO7ProgressiveMigrationStepManager *stepManager = [[ALO7ProgressiveMigrationStepManager alloc] init];
-    BOOL isMigrateStepsGenerated = [self generateMigrateStepsWithManager:stepManager forStoreAtUrl:srcStoreUrl storeType:storeType targetMode:targetModel bundles:bundles error:error];
+    BOOL isMigrateStepsGenerated = [self generateMigrateStepsWithManager:stepManager forStoreAtUrl:srcStoreUrl storeType:storeType targetMode:targetModel bundle:bundle error:error];
     if (!isMigrateStepsGenerated) {
         NSLog(@"%@ generate migrate steps failed!", NSStringFromClass([self class]));
         return NO;
@@ -81,7 +84,7 @@
 
 #pragma mark - Migrate details(private methods)
 
-- (BOOL)generateMigrateStepsWithManager:(ALO7ProgressiveMigrationStepManager *)stepManager forStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType targetMode:(NSManagedObjectModel *)targetModel bundles:(NSArray *)bundles error:(NSError **)error
+- (BOOL)generateMigrateStepsWithManager:(ALO7ProgressiveMigrationStepManager *)stepManager forStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType targetMode:(NSManagedObjectModel *)targetModel bundle:(NSBundle *)bundle error:(NSError **)error
 {
     // find the data model file according to the source store file
     NSDictionary *srcMetaData = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:storeType URL:srcStoreUrl error:error];
@@ -89,7 +92,7 @@
         *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorSrcStoreMetaDataNotFound];
         return NO;
     }
-    NSManagedObjectModel *srcModel = [NSManagedObjectModel mergedModelFromBundles:bundles forStoreMetadata:srcMetaData];
+    NSManagedObjectModel *srcModel = [NSManagedObjectModel mergedModelFromBundles:bundle ? @[ bundle ] : nil forStoreMetadata:srcMetaData];
     self.migrationSrcModel = srcModel;
     if (!srcModel) {
         *error = [ALO7ProgressiveMigrationError errorWithCode:kALO7ProgressiveMigrateErrorSrcStoreDataModelNotFound];
@@ -252,15 +255,15 @@
 {
     if (!_allDataModelPaths) {
         NSMutableArray *modelPaths = [NSMutableArray array];
-        
-        NSArray *momdArray = [[NSBundle mainBundle] pathsForResourcesOfType:@"momd" inDirectory:nil];
+        NSBundle *bundle = self.bundle ?: [NSBundle mainBundle];
+        NSArray *momdArray = [bundle pathsForResourcesOfType:@"momd" inDirectory:nil];
         for (NSString *momdPath in momdArray) {
             NSString *resourceSubpath = [momdPath lastPathComponent];
-            NSArray *array = [[NSBundle mainBundle] pathsForResourcesOfType:@"mom" inDirectory:resourceSubpath];
+            NSArray *array = [bundle pathsForResourcesOfType:@"mom" inDirectory:resourceSubpath];
             [modelPaths addObjectsFromArray:array];
         }
         
-        NSArray* otherModels = [[NSBundle mainBundle] pathsForResourcesOfType:@"mom" inDirectory:nil];
+        NSArray* otherModels = [bundle pathsForResourcesOfType:@"mom" inDirectory:nil];
         [modelPaths addObjectsFromArray:otherModels];
         
         _allDataModelPaths = [modelPaths copy];

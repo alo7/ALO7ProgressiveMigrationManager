@@ -36,7 +36,7 @@
 
 @interface ALO7ProgressiveMigrationManager : NSObject
 + (instancetype)sharedManager;
-- (BOOL)migrateStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType targetModel:(NSManagedObjectModel *)targetModel bundles:(NSArray *)bundles error:(NSError **)error;
+- (BOOL)migrateStoreAtUrl:(NSURL *)srcStoreUrl storeType:(NSString *)storeType targetModel:(NSManagedObjectModel *)targetModel bundle:(NSBundle *)bundle error:(NSError **)error;
 
 @property (nonatomic, weak) id <ALO7ProgressiveMigrateDelegate> delegate;
 @property (nonatomic, strong, readonly) NSManagedObjectModel *migrationSrcModel;
