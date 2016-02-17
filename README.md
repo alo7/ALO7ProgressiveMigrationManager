@@ -42,7 +42,7 @@ ALO7ProgressiveMigrationManager needs a searching rule for ManagedObjectModel, t
 
 Assigning an instance which conforms to ```ALO7ProgressiveMigrateDelegate``` to the ```delegate``` property of ALO7ProgressiveMigrationManager to implement the searching rule. 
 
-Notice that this configuration is optional, ALO7ProgressiveMigrationManager has a default internal searching rule which searches for the next consecutive ManagedObjectModel with the ```Identifier``` attribute increased by 1 (which is  set in the ManagedObjectModel`s file inspector panel in XCode). If you use the default searching rule, you need to ensure that the Identifier value of all ManagedObjectModels have been set correctly (e.g. 1, 2, 3, ...). And every new ManagedObjectModel added in the future also needs to be set with a correct Identifier value.
+Notice that this configuration is optional, ALO7ProgressiveMigrationManager has a default internal searching rule which searches for the next consecutive ManagedObjectModel with the ```Identifier``` attribute increased by 1 (which is  set in the ManagedObjectModel`s file inspector panel in Xcode). If you use the default searching rule, you need to ensure that the Identifier value of all ManagedObjectModels have been set correctly (e.g. 1, 2, 3, ...). And every new ManagedObjectModel added in the future also needs to be set with a correct Identifier value.
 ##Acknowledgements
 ALO7ProgressiveMigrationManager learned a lot from [Marcus S. Zarra][core data book author twitter] - [Core Data Book][core data book]. Thanks for his great work.
 ##License
